@@ -105,4 +105,5 @@ def process_large_files(directory, file_ext, requirement, output):
 folder_path = "/Users/gwonii/Documents/iOS/OpenSource/DifferenceKit/Sources"
 file_ext = ".swift"
 requirement = "protocol 별로 property, method 표로 정리해주고 핵심 로직 분석해줘, 그리고 간단한 사용법 및 응용할 수 있는 방법들도 정리해줘"
-process_large_files(folder_path, file_ext, requirement, "DifferenceKit.md")
+print("completed")
+# process_large_files(folder_path, file_ext, requirement, "DifferenceKit.md")
