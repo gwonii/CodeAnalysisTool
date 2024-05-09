@@ -2,14 +2,10 @@ import os
 import tiktoken
 from openai import OpenAI
 
-GPT_MODEL = "gpt-3.5-turbo"
-TOKEN_LIMIT_RATIO = 0.8
-TOKEN_LIMIT = 4096
-TOKEN_THRESHOLD = int(TOKEN_LIMIT * TOKEN_LIMIT_RATIO)
+GPT_MODEL = "gpt-4-turbo"
 
-tokenizer = tiktoken.get_encoding("p50k_base")
 client = OpenAI(
-    api_key="sk-proj-qfUepXimxE6IuYuedANVT3BlbkFJtw9Bi1Us4EdTtpDTq591",
+    api_key="",
 )
 
 def count_tokens(text):
@@ -19,45 +15,22 @@ def count_tokens(text):
         print(f"에러: {e}")
         return 0
 
-def split_into_parts(content):
-    lines = content.split('\n')
-    parts = []
-    part = ""
-
-    for line in lines:
-        if count_tokens(part + line) > TOKEN_THRESHOLD:
-            parts.append(part)
-            part = line + '\n'
-        else:
-            part += line + '\n'
-
-    parts.append(part)
-    return parts
-
 def analyze_code(requirement, code):
     messages = [
-        # {
-        #     "role": "system",
-        #     "content": "You are a helpful assistant."
-        # },
         {
             "role": "system",
-            "content": "한글로 대답해줘"
+            "content": "개발 용어를 제외한 나머지는 한글로 대답해줘"
+        },
+        {
+            "role": "assistant",
+            "content": f"{code}"
+        },
+        {
+            "role": "user", 
+            "content": f"{requirement}"
         }
     ]
 
-    if requirement:
-        messages.append({
-            "role": "user", 
-            "content": f"{requirement}: \n```\n{code}\n```"
-        })
-    else:
-        messages.append({
-            "role": "user", 
-            "content": f"Here is some code for analysis, don't need to answer: \n```\n{code}\n```"
-        })
-
-    print(f"--> request messages: {messages}")
     completion = client.chat.completions.create(
         messages=messages,
         model=GPT_MODEL
@@ -96,42 +69,21 @@ def process_large_files(directory, file_ext, requirement, output):
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as file_content:
                 content = file_content.read()
 
-            # parts += split_into_parts(content)
             contents += f"\n{content}\n"
-            
-            # for i, part in enumerate(parts, start=1):
-            #     print(f"parts count: {parts.count} / current count: {i}")
-            #     if i == parts.count:
-            #         print("last")
-            #         analysis = analyze_code(requirement, part)
-            #     else:
-            #         print("not last")
-            #         analysis = analyze_code("", part)
 
-            #     if analysis:
-            #         parts_analysis[str(i)] = analysis
+    print(f"{count_tokens}")
+    # analysis = analyze_code(requirement, contents)
+    # parts_analysis[1] = analysis
                 
-            # write_markdown_report(report_file_path, file_relative_path, parts_analysis)
-    
-    # for i, part in enumerate(parts, start=1):
-    #     print(f"parts count: {len(parts)} / current count: {i}")
-        # if i == len(parts):
-            # print("last")
-            
-        # else:
-            # print("not last")
-        # analysis = analyze_code("", part)
-
-        # if analysis:
-    analysis = analyze_code(requirement, contents)
-    parts_analysis[1] = analysis
-                
-    # analysis = analyze_code(f"이전 {len(parts)} 개의 제공된 코드들을 기반으로 / {requirement}", "")
-    write_markdown_report(report_file_path, file_relative_path, parts_analysis)
+    # write_markdown_report(report_file_path, file_relative_path, parts_analysis)
 
 folder_path = "/Users/nhn/Documents/OpenSoruces/KarrotListKit/Sources/KarrotListKit"
-# folder_path = "/Users/nhn/Documents/Gaein/CodeAnalysisTool/Sources/SwiftDummies"
 file_ext = ".swift"
-requirement = "protocol 별로 property, method 표로 정리해주고 핵심 로직 분석해줘, 그리고 간단한 사용법 및 응용할 수 있는 방법들도 정리해줘"
-# requirement = "protocol, class, struct 로 분리해서 표로 정리해봐"
-process_large_files(folder_path, file_ext, requirement, "Report2.md")
+requirement = """
+내 요청은 아래의 4가지야
+1. 주어진 코드들을 기반으로 모든 class와 struct 를 표로 작성해줘
+2. 중요한 class 또는 struct 를 순서대로 표기해줘. 가장 우선적으로 확인해야 하는 것들이 중요한 것이야
+3. 존재하는 모든 class와 struct 의 상세 내용과 관계를 알기 위하여 mermaid 문법에 맞춰 class diagram 을 만들어줘
+4. extension 항목들에 대해서 내가 쉽게 볼 수 있도록 잘 정리된 표로 작성해줘
+"""
+process_large_files(folder_path, file_ext, requirement, "KarrotListKit_ClassDiagram4.md")
