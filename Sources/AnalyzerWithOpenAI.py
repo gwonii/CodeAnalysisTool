@@ -1,3 +1,5 @@
+# 전체 프로젝트의 코드를 분석하여 요구사항에 맞게 class diagram을 작성하는 코드
+
 import os
 import tiktoken
 from openai import OpenAI
@@ -72,18 +74,12 @@ def process_large_files(directory, file_ext, requirement, output):
             contents += f"\n{content}\n"
 
     print(f"{count_tokens}")
-    # analysis = analyze_code(requirement, contents)
-    # parts_analysis[1] = analysis
+    analysis = analyze_code(requirement, contents)
+    parts_analysis[1] = analysis
                 
-    # write_markdown_report(report_file_path, file_relative_path, parts_analysis)
+    write_markdown_report(report_file_path, file_relative_path, parts_analysis)
 
-folder_path = "/Users/nhn/Documents/OpenSoruces/KarrotListKit/Sources/KarrotListKit"
+folder_path = "Files/"
 file_ext = ".swift"
-requirement = """
-내 요청은 아래의 4가지야
-1. 주어진 코드들을 기반으로 모든 class와 struct 를 표로 작성해줘
-2. 중요한 class 또는 struct 를 순서대로 표기해줘. 가장 우선적으로 확인해야 하는 것들이 중요한 것이야
-3. 존재하는 모든 class와 struct 의 상세 내용과 관계를 알기 위하여 mermaid 문법에 맞춰 class diagram 을 만들어줘
-4. extension 항목들에 대해서 내가 쉽게 볼 수 있도록 잘 정리된 표로 작성해줘
-"""
-process_large_files(folder_path, file_ext, requirement, "KarrotListKit_ClassDiagram4.md")
+requirement = "요청사항"
+process_large_files(folder_path, file_ext, requirement, "Report.md")

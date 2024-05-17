@@ -1,8 +1,9 @@
+# 파일별 분석 결과를 markdown 파일로 저장하는 코드
+
 import os
 import tiktoken
 from openai import OpenAI
 
-# GPT-3.5-turbo API 설정
 client = OpenAI(
     api_key="",
 )
@@ -42,11 +43,11 @@ def analyze_code(requirement, code):
         },
         {
             "role": "assistant",
-            "content": ""
+            "content": f"{code}"
         },
         {
             "role": "user", 
-            "content": f"{requirement}: \n```\n{code}\n```"
+            "content": f"{requirement}"
         }
     ]
 
@@ -95,7 +96,8 @@ def process_large_files(directory, file_ext, requirement, output):
 
             write_markdown_report(report_file_path, file_relative_path, parts_analysis)
 
-folder_path = "/Users/nhn/Documents/OpenSoruces/KarrotListKit/Sources/KarrotListKit"
+folder_path = "Files/"
 file_ext = ".swift"
-requirement = "protocol 별로 property, method 표로 정리해주고 핵심 로직 분석해줘, property 의 경우에는 type 도 같이 명시해줘"
-process_large_files(folder_path, file_ext, requirement, "KarrotListKit_Report.md")
+requirement = "요청사항"
+
+process_large_files(folder_path, file_ext, requirement, "Report.md")
